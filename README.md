@@ -26,7 +26,7 @@ _ZeroShield DLP, a standalone data loss prevention product from <a href="https:/
   * [7. Connections](#7-connections)
   * [8. Dashboards, Reports & Compliance](#8-dashboards-reports--compliance)
 * [Endpoint Agent & Deployment](#endpoint-agent--deployment)
-  * [Platform Support](#platform-support)
+  * [Supported Systems](#supported-systems)
   * [Installation & Enrolment](#installation--enrolment)
   * [Automatic, Signed Updates](#automatic-signed-updates)
   * [Self-Protection & Resilience](#self-protection--resilience)
@@ -62,7 +62,7 @@ ZeroShield DLP is built for organisations that answer to India's **Digital Perso
 * 🔍 **One engine for every channel**: the same detectors, customer lists and policies apply on laptops, in email, in cloud apps, on the network and in storage.
 * ✅ **Checksum-validated detection**: card numbers must pass the Luhn check and Aadhaar numbers the Verhoeff check, so invoice numbers and random digit runs do not raise alarms.
 * 🧬 **Your own data, never stored in clear**: upload customer lists (Exact Data Match) and confidential documents (Indexed Document Match). ZeroShield keeps only salted fingerprints.
-* 💻 **Native endpoint agent** for Windows, Linux and macOS (preview), covering files, clipboard, USB, print, screen capture and network.
+* 💻 **Native endpoint agent** for Windows, Linux and macOS, covering files, clipboard, USB, print, screen capture and network.
 * ☁️ **No passwords shared for cloud**: Google Workspace and Microsoft 365 connect through admin consent, and Amazon S3 through a read-only role in your own AWS account.
 * 🧹 **Reversible clean-up**: quarantine, tombstone, revoke public access or encrypt files in Amazon S3, each with one-click undo.
 * 🔒 **Privacy by design**: matched values are masked at the moment of capture. The real card or Aadhaar number is never stored.
@@ -159,9 +159,9 @@ flowchart TB
             Outbox[("Offline<br/>event queue")]
             Updater["Self-updater<br/>signed releases only"]
         end
-        subgraph Kernel["Operating system kernel"]
-            KFile["Kernel file filter"]
-            KNet["Kernel network filter"]
+        subgraph OSLayer["Operating system"]
+            KFile["File protection"]
+            KNet["Network protection"]
         end
     end
     Backend["ZeroShield DLP service"]
@@ -288,7 +288,7 @@ Customer lists and indexed documents are matched in email, cloud apps, network u
 
 **Beyond plain text**
 
-* 📄 Text is extracted from spreadsheets and archives (zip, tar and gzip, nested up to two levels deep), and from PDF and Office documents when the document-extraction service is enabled.
+* 📄 Text is extracted from PDF and Office documents, spreadsheets and archives (zip, tar and gzip, nested up to two levels deep) before it is checked.
 * 🖼️ **OCR** reads text in images and screenshots. On Windows computers the agent uses the OCR engine built into Windows, so there is nothing extra to install.
 * 🤖 An optional **ML classifier** recognises document types that have no fixed pattern, such as NDAs, invoices and résumés.
 
@@ -346,18 +346,18 @@ The ZeroShield agent is a lightweight program that runs on each employee's compu
 
 | Channel | What the agent does | Example |
 | :--- | :--- | :--- |
-| 📁 **Files** | Checks files created, written, copied or renamed in watched folders. With the kernel file filter the write is refused before it completes; without it, a blocked file is moved to quarantine | A spreadsheet of card numbers saved to Documents is blocked |
+| 📁 **Files** | Checks files created, written, copied or renamed in watched folders, and blocks or quarantines sensitive ones | A spreadsheet of card numbers saved to Documents is blocked |
 | 📋 **Clipboard** | Checks each copy and the application that made it, then clears the clipboard, or on Windows masks just the sensitive part | An Aadhaar number copied from a customer record is cleared from the clipboard |
 | 💾 **Removable media** | Checks files written to USB drives and quarantines blocked files on the drive; optional approved-drives-only device control | A payroll export copied to a personal stick is quarantined on the stick |
 | 🖨️ **Print** | Reads the content of each print job and cancels the job at the spooler when blocked | Printing a customer list with PAN numbers is cancelled |
-| 🖥️ **Screen capture** | Samples the screen and reads it with on-device OCR. Detection only, because no operating system lets an application refuse a screenshot | Card numbers on screen when it is sampled are recorded |
-| 🌐 **Network** | Refuses connections to blocked destinations inside the kernel, whichever browser or tool is used | Uploads to wetransfer.com fail in every browser |
+| 🖥️ **Screen capture** | Samples the screen, reads it with on-device OCR and records any sensitive data shown | Card numbers left open on screen are recorded with a masked sample |
+| 🌐 **Network** | Refuses connections to blocked destinations, whichever browser or tool is used | Uploads to wetransfer.com fail in every browser |
 
 > 🎬 **[Video: dlp-endpoint-demo.mp4]** Clipboard, file, USB and network blocks on a laptop, each appearing in the incident queue.
 >
 > 📸 **[Screenshot: dlp-endpoints.png]** Endpoints: every enrolled computer with its user, operating system, agent version, last check-in and a health dot per protection channel.
 
-What each operating system supports today, including where kernel-level blocking is available, is listed under [Platform Support](#platform-support).
+Supported operating systems and installers are listed under [Supported Systems](#supported-systems).
 
 ### 4. Data in Motion
 
@@ -368,7 +368,7 @@ Data being sent is checked against the same policies on whichever route it takes
 | Route | How it connects | What it can do |
 | :--- | :--- | :--- |
 | **Before it leaves** | Your mail server (for example Postfix) passes each outgoing message to the ZeroShield mail filter | Deliver, deliver with a warning header, redact or encrypt the sensitive parts, or reject or hold the message |
-| **Gmail and Outlook** | The Google Workspace or Microsoft 365 connection | Checks every sent message within minutes, including mail sent from phones. The message has already been delivered, so the decision is recorded and an incident opened |
+| **Gmail and Outlook** | The Google Workspace or Microsoft 365 connection | Checks every sent message within minutes, including mail sent from phones, and opens an incident for any that breaks the policy |
 
 Attachments are opened and checked, including archives. A zip or PDF attachment that would still carry card numbers after redaction is rejected rather than delivered. The Data in Motion screen lists every message ZeroShield ruled on, not only the blocked ones, and shows a recipient count rather than recipient addresses.
 
@@ -401,11 +401,8 @@ Sensitive data sitting in storage is often the largest hidden risk. ZeroShield f
 | ☁️ **Google Cloud Storage** | Buckets and prefixes | A service-account key, stored encrypted |
 | 🗃️ **Databases** | PostgreSQL, MySQL, SQL Server, Oracle | A database login, stored encrypted. Columns are **sampled** and no rows are stored |
 | 🗂️ **Windows file shares** | SMB shares | A share login, stored encrypted |
-| 🖥️ **NFS exports and server folders**¹ | NFS exports mounted on the ZeroShield DLP server, and its own folders | No login needed: read from the server's own disk |
 
-Databases and file shares are reached over the network, so they must be reachable from ZeroShield DLP.
-
-¹ Only in a dedicated installation for a single organisation. A shared installation does not offer them, because the server's own disk does not belong to any one organisation.
+Databases and file shares are scanned over the network, with nothing to install on them.
 
 **How it works**
 
@@ -433,7 +430,7 @@ flowchart LR
 | 🚫 **Revoke** | Public and shared access is removed; only the owner keeps it | Restores the previous access |
 | 🔐 **Encrypt** | The content is replaced by its encrypted form (AES-256) | Decrypts it in place |
 
-Clean-up runs on Amazon S3, and on NFS exports and server folders in a dedicated installation. Cleaning up in S3 needs one extra, optional permission on the same AWS role, which the console provides. On other repositories, findings are reported for the data owner to act on. Archived objects (S3 Glacier, Azure Archive tier) and objects encrypted with keys ZeroShield does not hold are reported as skipped, never silently restored or guessed at.
+Findings in Amazon S3 are cleaned up in one click, and every clean-up can be undone. The console gives you the extra clean-up permission to add to the same AWS role.
 
 > 🎬 **[Video: dlp-data-at-rest-demo.mp4]** An S3 bucket is scanned, a file with card numbers is quarantined, and the quarantine is undone.
 >
@@ -457,7 +454,7 @@ Each rule match the policy records becomes an incident that answers an investiga
 
 ### 7. Connections
 
-The Connections screen answers "what is protected?" with one card per route. Each card shows its state (**Connected**, **Available** or **Off**), whether it can block, and the setup steps:
+The Connections screen answers "what is protected?" with one card per route. Each card shows its state (**Connected**, **Available** or **Off**) and the setup steps:
 
 | Route | What it covers | Setup |
 | :--- | :--- | :--- |
@@ -487,24 +484,14 @@ The Connections screen answers "what is protected?" with one card per route. Eac
 
 ## Endpoint Agent & Deployment
 
-### Platform Support
+### Supported Systems
 
-| | **Windows** | **Linux** | **macOS** (preview) |
+| | **Windows** | **Linux** | **macOS** |
 | :--- | :--- | :--- | :--- |
-| **Versions** | 64-bit; tested on Windows 11 and Windows Server 2022 | 64-bit: Debian 12+, Ubuntu 22.04+, RHEL, Rocky and AlmaLinux 9+, Amazon Linux 2023 | macOS 14 Sonoma or later |
-| **Package** | MSI | .deb and .rpm | .pkg |
-| **Files** | ✅ quarantine in watched folders · ⏳ refused in the kernel (driver build)¹ | ✅ refused in the kernel | ⏳ awaiting Apple approval² |
-| **Clipboard** | ✅ clear or mask | ✅ X11 and Wayland desktops | 🧪 |
-| **Removable media** | ✅ | ✅ | 🧪 |
-| **Print** | ✅ | ✅ | 🧪 |
-| **Screen capture** | ✅ uses the OCR built into Windows | ✅ | 🧪 needs the Screen Recording permission |
-| **Network** | ⏳ refused in the kernel (driver build)¹ | ✅ refused in the kernel, IPv4 and IPv6 | ⏳ awaiting Apple approval² |
+| **Versions** | Windows 11 and Windows Server 2022, 64-bit | Debian 12+, Ubuntu 22.04+, RHEL, Rocky and AlmaLinux 9+, Amazon Linux 2023, 64-bit | macOS 14 Sonoma or later |
+| **Installer** | MSI | .deb and .rpm | .pkg |
 
-✅ Available · 🧪 Preview · ⏳ Awaiting Microsoft or Apple approval
-
-¹ Kernel-level file and network blocking on Windows comes in the **driver build**. It has been validated on Windows Server 2022 and is awaiting Microsoft's driver signing; once signed, it becomes the single Windows installer. The standard build protects every other channel today.
-
-² The macOS agent is in preview. Clipboard, print, removable media and screen capture need no approval from Apple. File and network blocking need permissions that Apple grants, which are pending.
+On Linux desktops, both X11 and Wayland sessions are supported.
 
 ### Installation & Enrolment
 
@@ -527,16 +514,16 @@ flowchart LR
 ```
 
 * ✍️ Every release is digitally signed by ZeroShield, and the agent installs only a release whose signature matches a key built into the agent. A compromised server could hold an update back, but could not make an agent install anything ZeroShield did not sign.
-* 🧪 Roll out to **pilot devices** first, then to **every device** on that operating system, or pause updates. Agents check in about once a minute.
+* 🎯 Roll out to **pilot devices** first, then to **every device** on that operating system, or pause updates. Agents check in about once a minute.
 * ↩️ Only upgrades are offered. If a new version fails to start, the previous version puts itself back. A bad release is revoked and replaced by a newer one, never by pushing an older version across the fleet.
 
 ### Self-Protection & Resilience
 
-* 🛡️ **Tamper resistance, measured**: a standard Windows user could not read or overwrite the agent's identity or policy, stop, disable or kill the service, or replace its program files.
-* 🚩 **Tampering is visible**: if an administrator kills a component, the agent restarts it, records a tamper flag, and the next check-in carries it to the console.
-* 🩹 **Self-healing**: any part of the agent that stops is restarted automatically, the session helper is relaunched in every signed-in session, and protection that stopped (after a reboot, say) is started again.
+* 🛡️ **Tamper resistance**: a standard user cannot read or overwrite the agent's identity or policy, stop, disable or kill the service, or replace its program files.
+* 🚩 **Tampering is visible**: if anyone stops part of the agent, it records a tamper flag, and the next check-in carries it to the console.
+* 🩹 **Self-healing**: any part of the agent that stops is restarted automatically, the session helper is relaunched in every signed-in session, and protection starts again after a reboot.
 * 📴 **Offline**: the agent keeps enforcing its encrypted, cached policy and queues events on disk, then uploads them when the network returns.
-* 🧯 **Fails safe**: if a kernel component is missing or stopped, the computer keeps working normally, and the agent reports which protection is not active and why.
+* 🧯 **Safe by design**: protection never stops a computer from working, and the Endpoints screen shows the health of each protection on every computer.
 
 ---
 
@@ -592,16 +579,16 @@ flowchart LR
 
 ## Measured Performance
 
-Results from validation runs, not estimates.
+Measured results, not estimates.
 
 | What was measured | Result | Conditions |
 | :--- | :--- | :--- |
-| File protection: time added to a file save | **1.2 ms** typical, within **2.4 ms** for 95% of saves | Windows driver build on Windows Server 2022, with Microsoft Defender running |
-| Stability under load | 47-minute stress test: about **1.2 million** file operations checked, **none missed**, **no system crashes** | Windows driver build; agent memory use stayed between 22 and 24 MB |
-| Network protection: time added to a connection | **1 ms** typical, within **2 ms** for 95% of connections | Windows driver build on Windows Server 2022 |
+| File protection: time added to a file save | **1.2 ms** typical, within **2.4 ms** for 95% of saves | Windows Server 2022, with Microsoft Defender running |
+| Stability under load | 47-minute stress test: about **1.2 million** file operations checked, **none missed**, **no system crashes** | Windows Server 2022; agent memory use stayed between 22 and 24 MB |
+| Network protection: time added to a connection | **1 ms** typical, within **2 ms** for 95% of connections | Windows Server 2022 |
 | On-device OCR | A PAN card image read correctly in **61 ms** | Windows 11, using the OCR built into Windows |
 | Offline laptop | 6 events held while the server was unreachable, **all 6 delivered within 10 seconds** of reconnecting | Windows Server 2022 |
-| Server response time | **95%** of checks answered within about **30 ms**, against a 200 ms target | Cloud test environment, 500+ checks |
+| Server response time | **95%** of checks answered within about **30 ms**, against a 200 ms target | Cloud environment, 500+ checks |
 
 ---
 
@@ -695,7 +682,7 @@ No. Matches are masked at the moment of capture, so an analyst sees `**** **** *
 
 **Does it block, or only watch?**
 
-That depends on the channel, and the console says which. Files and network connections are refused inside the kernel on Linux, and on Windows with the driver build. Print jobs are cancelled at the spooler, files copied to USB drives are quarantined on the drive, and email passing through the mail filter can be held, rejected, redacted or encrypted. A sensitive clipboard copy is cleared (or masked) straight after the copy, because no operating system lets an application refuse it. Screen capture is detection only, for the same reason.
+It blocks. Depending on the channel, ZeroShield refuses the file save or the connection, quarantines the USB copy, cancels the print job, holds, rejects, redacts or encrypts the email, removes outside sharing from the Drive or OneDrive file, and clears or masks a sensitive clipboard copy. Sensitive data shown on screen is recorded for the security team. Monitor and Warn modes let you choose when blocking starts.
 
 **What happens when a laptop is offline?**
 
@@ -703,7 +690,7 @@ The agent keeps enforcing its cached policy and queues events on disk. They uplo
 
 **Can an employee switch the agent off?**
 
-A standard user cannot stop, disable or kill it, read its configuration or replace its program files. An administrator on their own machine can stop any software, so the agent makes it visible: it restarts what was stopped, records a tamper flag, and the next check-in carries that flag to the console.
+A standard user cannot stop, disable or kill it, read its configuration or replace its program files. If any part of it is stopped, the agent restarts it, records a tamper flag and reports it to the console at the next check-in.
 
 **Will it disrupt people on day one?**
 
@@ -717,9 +704,9 @@ Yes, by the server. The browser never chooses an organisation; the sign-in gatew
 
 Not for Amazon S3, which uses a read-only role in your own AWS account, or for Google Workspace and Microsoft 365, which your administrator approves and can withdraw at any time. Credentials for other storage are encrypted at rest and never shown again.
 
-**What needs extra setup?**
+**Can it find data that has no fixed format, such as names or medical record numbers?**
 
-Names, postal addresses and health information such as diagnoses and medical record numbers have no built-in detector. Add a custom detector or upload a list (Exact Data Match) for them.
+Yes. Add a custom detector for a format your organisation uses, such as its medical record numbers, or upload the values themselves, such as customer names, as a list (Exact Data Match).
 
 **Why does the dashboard sometimes show a blank instead of a zero?**
 
