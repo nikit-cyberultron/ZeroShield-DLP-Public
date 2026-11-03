@@ -6,7 +6,7 @@
 
 <img width="365" height="100" alt="Zero-Shield" src="https://github.com/user-attachments/assets/ac395e39-3282-4acd-8534-3097f588c486" />
 
-_ZeroShield DLP, a core module of <a href="https://zeroshield.ai">ZeroShield</a>_
+_ZeroShield DLP, a standalone data loss prevention product from <a href="https://zeroshield.ai">ZeroShield</a>_
 
 ## 🚀 [Explore ZeroShield Solutions](https://zeroshield.ai)
 </div>
@@ -24,14 +24,14 @@ _ZeroShield DLP, a core module of <a href="https://zeroshield.ai">ZeroShield</a>
   * [5. Data at Rest](#5-data-at-rest)
   * [6. Incident Management & Investigation](#6-incident-management--investigation)
   * [7. Connections](#7-connections)
-  * [8. Dashboards, Reports & Compliance Evidence](#8-dashboards-reports--compliance-evidence)
+  * [8. Dashboards, Reports & Compliance](#8-dashboards-reports--compliance)
 * [Endpoint Agent & Deployment](#endpoint-agent--deployment)
   * [Platform Support](#platform-support)
   * [Installation & Enrolment](#installation--enrolment)
   * [Automatic, Signed Updates](#automatic-signed-updates)
   * [Self-Protection & Resilience](#self-protection--resilience)
+* [Organisations, Users & Roles](#organisations-users--roles)
 * [Security & Data Protection](#security--data-protection)
-* [Organisations & Roles](#organisations--roles)
 * [Measured Performance](#measured-performance)
 * [Governance & Compliance](#governance--compliance)
 * [Recommended Rollout](#recommended-rollout)
@@ -45,7 +45,7 @@ _ZeroShield DLP, a core module of <a href="https://zeroshield.ai">ZeroShield</a>
 
 ## About ZeroShield DLP
 
-[**ZeroShield DLP**](https://zeroshield.ai) is the data loss prevention module of the ZeroShield platform. It finds sensitive data (Aadhaar and PAN numbers, payment cards, bank details, passwords and API keys, your customer lists and your confidential documents), decides whether to **allow**, **warn** or **block**, carries out the action your policy calls for, and records an incident with masked evidence.
+[**ZeroShield DLP**](https://zeroshield.ai) is a standalone data loss prevention product from ZeroShield. It finds sensitive data (Aadhaar and PAN numbers, payment cards, bank details, passwords and API keys, your customer lists and your confidential documents), decides whether to **allow**, **warn** or **block**, carries out the action your policy calls for, and records an incident with masked evidence. It has its own console, sign-up, user management and roles, so no other ZeroShield product is needed.
 
 It covers the three places data lives with **one detection engine, one set of policies and one console**:
 
@@ -53,7 +53,7 @@ It covers the three places data lives with **one detection engine, one set of po
 | :--- | :--- | :--- |
 | 💻 **Endpoints** | Employees' laptops and desktops | Files saved and copied, clipboard, USB drives, printing, screenshots, network uploads |
 | 📤 **Data in motion** | Data being sent | Outgoing email, Google Drive and OneDrive sharing, uploads through your web proxy, FTP and SFTP |
-| 🗄️ **Data at rest** | Data being stored | Amazon S3, Azure Blob Storage, Google Cloud Storage, PostgreSQL, MySQL, SQL Server, Oracle, Windows and NFS file shares |
+| 🗄️ **Data at rest** | Data being stored | Amazon S3, Azure Blob Storage, Google Cloud Storage, PostgreSQL, MySQL, SQL Server, Oracle and Windows file shares |
 
 ZeroShield DLP is built for organisations that answer to India's **Digital Personal Data Protection (DPDP) Act 2023** and RBI guidelines, as well as **PCI DSS**, **GDPR**, **HIPAA**, **ISO 27001** and **SOC 2**. Indian identifiers are first-class: Aadhaar numbers are validated with the Verhoeff checksum, GSTINs with their check character and PANs with their structure rules, alongside IFSC codes, UPI IDs and Indian passport and mobile numbers.
 
@@ -64,12 +64,13 @@ ZeroShield DLP is built for organisations that answer to India's **Digital Perso
 * 🧬 **Your own data, never stored in clear**: upload customer lists (Exact Data Match) and confidential documents (Indexed Document Match). ZeroShield keeps only salted fingerprints.
 * 💻 **Native endpoint agent** for Windows, Linux and macOS (preview), covering files, clipboard, USB, print, screen capture and network.
 * ☁️ **No passwords shared for cloud**: Google Workspace and Microsoft 365 connect through admin consent, and Amazon S3 through a read-only role in your own AWS account.
-* 🧹 **Reversible clean-up**: quarantine, tombstone, revoke public access or encrypt stored files, each with one-click undo.
+* 🧹 **Reversible clean-up**: quarantine, tombstone, revoke public access or encrypt files in Amazon S3, each with one-click undo.
 * 🔒 **Privacy by design**: matched values are masked at the moment of capture. The real card or Aadhaar number is never stored.
-* 📊 **Audit-ready reporting**: compliance reports for the DPDP Act 2023, PCI DSS v4.0, GDPR and the HIPAA Security Rule, plus control evidence sent to ZeroShield GRC.
+* 📊 **Audit-ready reporting**: compliance reports for the DPDP Act 2023, PCI DSS v4.0, GDPR and the HIPAA Security Rule, alongside channel coverage and detector health reports.
+* 🧩 **Standalone**: its own console, organisation sign-up, user management, roles and sign-in activity log. Nothing else from ZeroShield is required.
 * 🏢 **Multi-tenant**: each organisation's users, agents, rules, incidents and data are kept apart by the server, not by the browser.
 
-> 📸 **[Screenshot: dlp-overview.png]** DLP Overview: open incidents, agents online, sensitive findings, the 30-day incident trend and activity per channel.
+> 📸 **[Screenshot: dlp-overview.png]** Overview: open incidents, agents online, sensitive findings, the 30-day incident trend and activity per channel.
 
 ---
 
@@ -79,37 +80,35 @@ ZeroShield DLP follows a **Connect → Detect → Enforce → Prove** lifecycle:
 
 1. **Connect**: install the agent on computers, connect email and cloud apps, register storage and write policies, all from the console.
 2. **Detect**: every file, message, upload, clipboard copy, print job and stored object is checked by the same detection engine.
-3. **Enforce**: the policy engine picks the action, and the point of enforcement carries it out: the agent on the computer, the mail filter, your web proxy, the cloud-app connector or the storage scanner.
-4. **Prove**: each decision is recorded as an incident with masked evidence, reported per channel and per law, and sent to ZeroShield GRC as audit evidence.
+3. **Enforce**: the policy engine picks the action, and the point of enforcement carries it out: the agent on the computer, the mail filter, your web proxy, the cloud-app connection or the storage scanner.
+4. **Prove**: matches are recorded as incidents with masked evidence, and reported per channel and per law for your security team and your auditors.
 
 ### Architecture diagrams
 
-**High-level: where data is checked and how the platform fits together**
+**High-level: where data is checked and how the product fits together**
 
 ```mermaid
 graph LR
     subgraph Org["Your organisation"]
         Agent["ZeroShield agent<br/>Windows · Linux · macOS"]
-        Mail["Mail server<br/>with the ZeroShield mail filter"]
+        Mail["Your mail server"]
         Proxy["Web proxy<br/>Squid · Zscaler · Palo Alto · Fortinet"]
         Suites["Google Workspace<br/>Microsoft 365"]
         Storage["Cloud storage, databases<br/>and file shares"]
     end
 
-    subgraph ZS["ZeroShield platform"]
+    subgraph ZS["ZeroShield DLP"]
         Console["Web console"]
-        Gateway["Platform gateway<br/>sign-in · roles · tenant isolation"]
+        Gateway["Sign-in gateway<br/>sign-in · roles · tenant isolation"]
         DLP["DLP service<br/>detection · policy · incidents · fleet"]
         Workers["Storage scanner"]
-        GRC["ZeroShield GRC<br/>audit evidence"]
     end
 
     Console --> Gateway
     Gateway --> DLP
     DLP --> Workers
-    DLP -.->|"evidence"| GRC
     Agent <-->|"events, policy, signed updates"| DLP
-    Mail -->|"may this email leave?"| DLP
+    Mail -->|"may this email leave? (mail filter)"| DLP
     Proxy -->|"may this upload leave? (ICAP)"| DLP
     DLP <-->|"file and mail activity, sharing removal"| Suites
     Workers -->|"scan, clean up, undo"| Storage
@@ -130,7 +129,7 @@ flowchart TB
     Allow["Allow<br/>let it through"]
     Warn["Warn<br/>tell the person, record it"]
     Enforce["Block · redact · encrypt<br/>quarantine · revoke sharing"]
-    Incident["Incident with masked evidence<br/>and audit evidence"]
+    Incident["Incident with<br/>masked evidence"]
 
     Input --> Extract
     Extract --> Builtin & EDM & IDM & ML
@@ -187,7 +186,7 @@ sequenceDiagram
     participant Helper as Session helper
     participant Agent as Agent service
     participant DLP as DLP service
-    participant GW as Platform gateway
+    participant GW as Sign-in gateway
     actor Analyst
 
     Employee->>Helper: Copies a card number in Excel
@@ -199,8 +198,8 @@ sequenceDiagram
     Agent->>DLP: Event uploaded, retried while offline
     DLP->>DLP: Event stored and incident opened<br/>sample masked to the last 4 digits
     Analyst->>GW: Opens the incident queue
-    GW->>DLP: Request stamped with the analyst's tenant
-    DLP-->>GW: Incidents for that tenant only
+    GW->>DLP: Request scoped to the analyst's organisation
+    DLP-->>GW: That organisation's incidents only
     GW-->>Analyst: Who, which computer, what, which rule, what was done
 ```
 
@@ -213,13 +212,12 @@ flowchart LR
     WebProxy["Your web proxy"]
     MTA["Your mail server"]
 
-    subgraph Platform["ZeroShield platform"]
+    subgraph Product["ZeroShield DLP"]
         Entry["Secure entry point<br/>HTTPS only"]
         Console["Web console"]
-        Gateway["Platform gateway<br/>sign-in · roles · tenant isolation"]
+        Gateway["Sign-in gateway<br/>sign-in · roles · tenant isolation"]
         DLP["DLP service"]
         MailFilter["Mail filter"]
-        GRC["ZeroShield GRC"]
     end
 
     Browser -->|"HTTPS"| Entry
@@ -231,30 +229,31 @@ flowchart LR
     WebProxy -->|"encrypted ICAP"| DLP
     MTA --> MailFilter
     MailFilter --> DLP
-    DLP -.->|"audit evidence"| GRC
 ```
 
 * 🚪 The DLP service's management functions are never exposed to the internet. People reach them only by signing in to the console, and the browser never holds a key to the DLP service.
-* 🏷️ The browser never chooses which organisation's data it sees. The platform gateway takes the organisation from the signed-in session and applies it to every request; a request naming another organisation is refused and logged.
+* 🏷️ The browser never chooses which organisation's data it sees. The sign-in gateway takes the organisation from the signed-in session and applies it to every request; a request naming another organisation is refused and recorded in the audit log.
 * 🤖 Agents can reach only their own check-in, enrolment and installer-download functions, and each checks its own credential.
 
 ---
 
 ## Core Modules
 
-Everything is managed from the **Data Protection** section of the ZeroShield console:
+Everything is managed from the ZeroShield DLP console. Its **Data Protection** screens:
 
 | Screen | What it is for |
 | :--- | :--- |
-| **DLP Overview** | Open incidents, agents online, sensitive findings, scans, the 30-day trend and channel activity |
-| **Connections** | One card per route data can take, whether it is protected, and how to set it up |
+| **Overview** | Open incidents, agents online, sensitive findings, scans, the 30-day trend and channel activity |
 | **Incidents** | Every detection that opened an incident, with filters, triage and history |
 | **Policies** | The enforcement mode, computer settings and the rules in force |
+| **Endpoints** | The enrolled fleet, channel health, endpoint events, installers and agent updates |
+| **Connections** | One card per route data can take, whether it is protected, and how to set it up |
 | **Data at Rest** | Repositories, scans, findings, clean-up history and schedules |
 | **Data in Motion** | Activity per channel and every email decision |
-| **Endpoints** | The enrolled fleet, channel health, endpoint events, installers and agent updates |
 | **Detection & Tuning** | Your customer lists and documents, the rules in force and what has matched |
-| **DLP Reports** | Channel coverage, detector health and compliance reports |
+| **Reports** | Channel coverage, detector health and compliance reports |
+
+The **Settings** screens are **User Management**, **Access Control** and **My Account**, plus **Organisations** for ZeroShield operators. They are described under [Organisations, Users & Roles](#organisations-users--roles).
 
 ### 1. Detection Engine
 
@@ -320,7 +319,7 @@ A policy is the organisation's rulebook: what to look for, where, and what to do
 | **Keywords and custom patterns** | Your own markers and formats, with a live test box |
 | **Open an incident** | Record matches for the security team |
 | **Notify the user** | Show a Windows notification when a copy is warned about, blocked or masked |
-| **Let the user continue with a reason** | On Windows, a blocked file save, USB copy or clipboard copy asks the person why. With a reason, the file or copy is restored and the reason appears on the incident for review |
+| **Let the user continue with a reason** | On Windows, a blocked file save, USB copy or clipboard copy asks the person why. With a reason, the file or copy is restored and the reason appears on the incident for review, with any card number or PAN typed into it masked |
 
 **Actions**
 
@@ -335,7 +334,7 @@ A policy is the organisation's rulebook: what to look for, where, and what to do
 | 📝 **Tombstone** | Quarantine a stored file and leave a note in its place saying where it went |
 | 🚫 **Revoke** | Remove public or shared access to a stored file so only the owner keeps it |
 
-**Computer settings** decide what laptops watch: which channels are on, up to eight folders to watch (for example Documents, Desktop and Downloads), how often the screen is sampled (from every 30 seconds to every hour), and whether USB storage is open to all drives or limited to **approved drives**, identified by serial number. Laptops pick up a change within about a minute.
+**Computer settings** decide what laptops watch: which channels are on, up to eight folders to watch (for example Documents, Desktop and Downloads), and how often the screen is sampled (from every 30 seconds to every hour). They also decide whether USB storage is open to every drive or only to **approved drives**, identified by serial number, on Windows and Linux. A copy onto a drive that is not approved opens an incident with an **Approve this drive** button. Laptops pick up a change within about a minute.
 
 > 📸 **[Screenshot: dlp-policies.png]** Policies: enforcement mode, computer settings and the saved rules.
 >
@@ -368,7 +367,7 @@ Data being sent is checked against the same policies on whichever route it takes
 
 | Route | How it connects | What it can do |
 | :--- | :--- | :--- |
-| **Before it leaves** | The ZeroShield mail filter, added to your own mail server (for example Postfix) | Deliver, deliver with a warning header, redact or encrypt the sensitive parts, or reject or hold the message |
+| **Before it leaves** | Your mail server (for example Postfix) passes each outgoing message to the ZeroShield mail filter | Deliver, deliver with a warning header, redact or encrypt the sensitive parts, or reject or hold the message |
 | **Gmail and Outlook** | The Google Workspace or Microsoft 365 connection | Checks every sent message within minutes, including mail sent from phones. The message has already been delivered, so the decision is recorded and an incident opened |
 
 Attachments are opened and checked, including archives. A zip or PDF attachment that would still carry card numbers after redaction is rejected rather than delivered. The Data in Motion screen lists every message ZeroShield ruled on, not only the blocked ones, and shows a recipient count rather than recipient addresses.
@@ -401,7 +400,12 @@ Sensitive data sitting in storage is often the largest hidden risk. ZeroShield f
 | ☁️ **Azure Blob Storage and ADLS Gen2** | Containers and prefixes | An account key or SAS token, stored encrypted |
 | ☁️ **Google Cloud Storage** | Buckets and prefixes | A service-account key, stored encrypted |
 | 🗃️ **Databases** | PostgreSQL, MySQL, SQL Server, Oracle | A database login, stored encrypted. Columns are **sampled** and no rows are stored |
-| 🗂️ **File shares and folders** | Windows (SMB) shares, NFS exports, local folders on Windows, Linux and macOS | A share login, stored encrypted, or none for local folders |
+| 🗂️ **Windows file shares** | SMB shares | A share login, stored encrypted |
+| 🖥️ **NFS exports and server folders**¹ | NFS exports mounted on the ZeroShield DLP server, and its own folders | No login needed: read from the server's own disk |
+
+Databases and file shares are reached over the network, so they must be reachable from ZeroShield DLP.
+
+¹ Only in a dedicated installation for a single organisation. A shared installation does not offer them, because the server's own disk does not belong to any one organisation.
 
 **How it works**
 
@@ -429,7 +433,7 @@ flowchart LR
 | 🚫 **Revoke** | Public and shared access is removed; only the owner keeps it | Restores the previous access |
 | 🔐 **Encrypt** | The content is replaced by its encrypted form (AES-256) | Decrypts it in place |
 
-Clean-up runs on Amazon S3, local folders and NFS exports. On other repositories, findings are reported for the data owner to act on. Archived objects (S3 Glacier, Azure Archive tier) and objects encrypted with keys ZeroShield does not hold are reported as skipped, never silently restored or guessed at.
+Clean-up runs on Amazon S3, and on NFS exports and server folders in a dedicated installation. Cleaning up in S3 needs one extra, optional permission on the same AWS role, which the console provides. On other repositories, findings are reported for the data owner to act on. Archived objects (S3 Glacier, Azure Archive tier) and objects encrypted with keys ZeroShield does not hold are reported as skipped, never silently restored or guessed at.
 
 > 🎬 **[Video: dlp-data-at-rest-demo.mp4]** An S3 bucket is scanned, a file with card numbers is quarantined, and the quarantine is undone.
 >
@@ -465,20 +469,19 @@ The Connections screen answers "what is protected?" with one card per route. Eac
 
 > 📸 **[Screenshot: dlp-connections.png]** Connections: one card per route, with its live state and setup steps.
 
-### 8. Dashboards, Reports & Compliance Evidence
+### 8. Dashboards, Reports & Compliance
 
-**DLP Overview** is the security team's home page: open incidents, agents online (and how many report tampering), sensitive findings, scans, the 30-day incident trend with its blocked share, and activity per channel.
+**Overview** is the security team's home page: open incidents, agents online (and how many report tampering), sensitive findings, scans, the 30-day incident trend with its blocked share, and activity per channel.
 
-**DLP Reports** is written for management and auditors:
+**Reports** is written for management and auditors:
 
 * 📈 **Channel coverage**: for each channel, how many events it checked, how many it blocked, and its health, downloadable for your records.
 * 🩺 **Detector health**: how many detectors are loaded, enabled and actually able to match. A detector that is switched on but cannot match (for example a customer-list matcher with no list loaded) is named, with the reason.
 * 📚 **Compliance reports** for the **DPDP Act 2023**, **PCI DSS v4.0**, **GDPR** and the **HIPAA Security Rule**. Each shows the data the law protects, how far your policy covers it (including categories with no rule, or only a recording rule), the incidents, and the **data that got through**, which helps decide whether a breach must be reported (for example under GDPR's 72-hour rule). Reports contain no sample of the data, masked or not, and can be printed to PDF.
-* 🧾 **Evidence for ZeroShield GRC**: blocked transfers, classification and personal-data protection events are sent as audit evidence, mapped to ISO 27001:2022, SOC 2, PCI DSS 4.0, HIPAA, GDPR and DPDP controls. If GRC is unreachable, evidence waits in a durable queue and detection carries on.
 
 **Blank is not zero.** A blank means the feature is switched off, so nothing was measured; a zero means it was measured and nothing was found. A dashboard showing a confident zero for a channel nobody enabled would mislead the people relying on it.
 
-> 📸 **[Screenshot: dlp-reports.png]** DLP Reports: channel coverage, detector health and a DPDP Act 2023 compliance report.
+> 📸 **[Screenshot: dlp-reports.png]** Reports: channel coverage, detector health and a DPDP Act 2023 compliance report.
 
 ---
 
@@ -537,6 +540,28 @@ flowchart LR
 
 ---
 
+## Organisations, Users & Roles
+
+* 🏢 **Sign-up and approval**: an organisation signs up from the ZeroShield DLP sign-in page with its company name and its administrator's name, work email and password. ZeroShield operators approve or reject each request on the **Organisations** screen. Once a request is approved, the organisation is created and the person who signed up becomes its first administrator.
+* 🔐 **Fully private**: each organisation has its own users, agents, rules, incidents and data, and never sees another organisation's.
+* ⏸️ **Suspend and resume**: an operator can suspend an organisation, which signs its people out at once and stops them signing in until it is resumed. Nothing is deleted.
+* 👤 **User Management**: administrators add people with a role, change roles, reset passwords (which ends that person's sessions) and disable or re-enable accounts. If the administrator leaves the password blank, one is generated and shown once, because only its hash is kept. The **Auth Activity** tab lists sign-ins and account changes.
+* 🗝️ **Access Control** shows exactly what each role may do and how many people hold it. The permissions are read from the rules the server enforces, so the page cannot drift from what is actually allowed.
+* 🙋 **My Account** shows each person their name, role and organisation. Everyone can change their own password from the menu under their name.
+
+**Roles** change what the console shows and, more importantly, what the server permits:
+
+| Role | What they can do |
+| :--- | :--- |
+| **Administrator** | Everything, including policies, adding computers and managing users |
+| **Security Analyst** | Triage incidents, run scans, test content against the detectors and clean up findings. Can see the user list, but cannot change policies, add computers or manage users |
+| **Auditor** | Read every screen, including the user list; change nothing |
+| **Employee** | Sign in and see their own account; no console access |
+
+> 📸 **[Screenshot: dlp-user-management.png]** User Management: people and their roles, and the Auth Activity log.
+
+---
+
 ## Security & Data Protection
 
 ### Privacy by design
@@ -547,10 +572,10 @@ flowchart LR
 * 🕶️ **Optional pseudonymous mode**: incidents keep only a keyed hash of the user and no name or computer name, for organisations whose rules (a works council, for example) require investigators to see a pseudonym first.
 
 ### Access control & tenant isolation
-* 🏢 Each organisation is a separate tenant, enforced by the server: the tenant comes from the signed-in session, and a request naming another tenant is refused and logged.
+* 🏢 Each organisation is a separate tenant, enforced by the server: the tenant comes from the signed-in session, and a request naming another tenant is refused and recorded in the audit log.
 * 👥 **Role-based access**, checked by the server on every request. Anything a role is not explicitly allowed to do is refused.
-* 🔐 **Sign-in security**: passwords stored only as a strong one-way hash (Argon2id), sessions that end after 30 minutes idle or 12 hours in total, protection against cross-site request forgery, and a 15-minute lockout after 5 failed sign-ins.
-* 📝 **Audit trail**: organisation approvals and suspensions, cross-tenant attempts, configuration changes and every incident status change are recorded.
+* 🔐 **Sign-in security**: passwords of at least 12 characters, stored only as a strong one-way hash (Argon2id); sessions that end after 30 minutes idle or 12 hours in total; protection against cross-site request forgery; and a 15-minute lockout after 5 failed sign-ins. Changing a password ends the account's other sessions.
+* 📝 **Audit trail**: sign-ins (including failed and locked-out attempts), password changes and resets, changes to users, organisation approvals and suspensions, and refused cross-organisation requests are recorded in the audit log. Administrators, security analysts and auditors see their own organisation's entries under User Management → Auth Activity. Policy changes and every incident status change are recorded too.
 
 ### Credentials
 * ☁️ **AWS**: a read-only role in your own AWS account, usable only on behalf of your organisation. No AWS keys are stored.
@@ -562,20 +587,6 @@ flowchart LR
 * 🔒 The policy kept on each computer is encrypted (AES-256) and readable only by administrators.
 * 🎟️ The session helper has its own short-lived credential, withdrawn at sign-out, and cannot read the agent's secrets.
 * 🌐 Agents connect only over HTTPS, to a server with a publicly trusted certificate.
-
----
-
-## Organisations & Roles
-
-* 🏢 **Organisations sign up and ZeroShield approves them.** Once approved, an organisation is fully private: its own users, agents, rules, incidents and data. The operator can suspend and resume an organisation, and suspension ends every session of its users at once.
-* 👥 **Roles** change what the console shows and, more importantly, what the server permits:
-
-| Role | In the DLP console |
-| :--- | :--- |
-| **Administrator** | Everything, including policies and adding computers |
-| **Analyst** | Triage incidents, run scans and clean up findings; no policy changes |
-| **Auditor** | Read every screen; change nothing |
-| **Employee** | No console access |
 
 ---
 
@@ -603,7 +614,7 @@ Results from validation runs, not estimates.
 | 💳 **PCI DSS v4.0** | Luhn-validated card detection on every channel, discovery of stored card data, and a dedicated compliance report |
 | 🔏 **GDPR** | Personal-data detection, a list of data that got through to support the 72-hour breach decision, and a dedicated compliance report |
 | 🏥 **HIPAA Security Rule** | Detects the identifiers that make health information PHI, supports custom detectors for medical record numbers, and has a dedicated compliance report |
-| 📋 **ISO 27001:2022 and SOC 2** | Blocked transfers, classification and personal-data protection events sent to ZeroShield GRC as control evidence |
+| 📋 **ISO 27001:2022 and SOC 2** | Applies data leakage prevention (ISO 27001:2022 control 8.12) on every channel and controls how sensitive data is moved and shared. The incident history, coverage report and audit log give auditors the evidence |
 
 ZeroShield DLP also supports governance by:
 
@@ -650,12 +661,12 @@ Protect patient identifiers and clinical documents shared by email and cloud dri
 ### IT Services & SaaS
 Protect client contracts, design documents and credentials across a distributed workforce.
 
-**Example scenario:** Arjun heads security at a software services company that holds client contracts, architecture documents and cloud credentials. He indexes the contracts and design documents with Indexed Document Match, so an excerpt of 35 words or more in an outgoing email or web upload is caught. API keys, tokens and private keys are detected on laptops and in outgoing mail, and the company's web proxy blocks uploads that carry client data. Blocked transfers flow into ZeroShield GRC as evidence for the ISO 27001 and SOC 2 audits.
+**Example scenario:** Arjun heads security at a software services company that holds client contracts, architecture documents and cloud credentials. He indexes the contracts and design documents with Indexed Document Match, so an excerpt of 35 words or more in an outgoing email or web upload is caught. API keys, tokens and private keys are detected on laptops and in outgoing mail, and the company's web proxy blocks uploads that carry client data. For the ISO 27001 and SOC 2 audits, the incident history and the channel coverage report show auditors where client data is checked and what was blocked.
 
 ### Manufacturing & Engineering
 Protect drawings, price lists and supplier data that make up the company's competitive edge.
 
-**Example scenario:** Sanjay is IT head at an engineering manufacturer. He indexes design documents and supplier price lists with Indexed Document Match, and adds project code names as keywords. USB storage is limited to company-approved drives by serial number, so a file copied to a personal stick is quarantined on the stick whatever it contains. The engineering file server, exported over NFS, is scanned weekly, and stray copies of price lists in shared folders are tombstoned, leaving a note that tells colleagues where the file went.
+**Example scenario:** Sanjay is IT head at an engineering manufacturer. He indexes design documents and supplier price lists with Indexed Document Match, and adds project code names as keywords. USB storage is limited to company-approved drives by serial number, so a file copied to a personal stick is quarantined on the stick whatever it contains. The company's Amazon S3 buckets are scanned weekly, and stray copies of price lists are tombstoned, leaving a note that tells colleagues where the file went.
 
 ---
 
@@ -666,13 +677,17 @@ Protect drawings, price lists and supplier data that make up the company's compe
 * 🚪 **Insider risk and departing employees**: watch USB drives, printing, the clipboard, uploads and email for exports of customer data.
 * ☁️ **Cloud sharing hygiene**: remove public and external links on Drive and OneDrive files that hold sensitive data.
 * 🔑 **Secret leakage**: catch API keys, tokens and private keys before they leave laptops, mail and uploads.
-* 🗄️ **Data discovery and minimisation**: inventory sensitive data across S3, Azure, Google Cloud, databases and file shares, then quarantine or encrypt what should not be there.
+* 🗄️ **Data discovery and minimisation**: inventory sensitive data across S3, Azure, Google Cloud, databases and file shares, and quarantine or encrypt exposed files in S3.
 * 🚫 **Shadow IT**: block uploads to unsanctioned cloud apps and file-sharing sites.
-* 🧾 **Audit evidence**: give auditors per-law reports and channel coverage, and feed control evidence into ZeroShield GRC.
+* 🧾 **Audit preparation**: give auditors per-law compliance reports, the channel coverage report and the incident history.
 
 ---
 
 ## Frequently Asked Questions
+
+**Do we need any other ZeroShield product?**
+
+No. ZeroShield DLP is a standalone product with its own console, sign-up, users and roles.
 
 **Do you store the sensitive data you find?**
 
@@ -696,7 +711,7 @@ Not if you start in Monitor mode, which records everything and stops nothing. Mo
 
 **Is our data separated from other customers?**
 
-Yes, by the server. The browser never chooses a tenant; the platform gateway derives it from the signed-in session, and a request naming another organisation is refused and logged.
+Yes, by the server. The browser never chooses an organisation; the sign-in gateway takes it from the signed-in session, and a request naming another organisation is refused and recorded in the audit log.
 
 **Do you need our passwords to scan cloud storage or read cloud apps?**
 
