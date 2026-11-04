@@ -19,12 +19,15 @@ _ZeroShield DLP, a standalone data loss prevention product from <a href="https:/
 * [Core Modules](#core-modules)
   * [1. Detection Engine](#1-detection-engine)
   * [2. Policies & Enforcement](#2-policies--enforcement)
-  * [3. Endpoint DLP](#3-endpoint-dlp)
-  * [4. Data in Motion](#4-data-in-motion)
-  * [5. Data at Rest](#5-data-at-rest)
-  * [6. Incident Management & Investigation](#6-incident-management--investigation)
-  * [7. Connections](#7-connections)
-  * [8. Dashboards, Reports & Compliance](#8-dashboards-reports--compliance)
+  * [3. Groups](#3-groups)
+  * [4. Endpoint DLP](#4-endpoint-dlp)
+    * [Block Screen Capture](#block-screen-capture)
+  * [5. Data in Motion](#5-data-in-motion)
+  * [6. Data at Rest](#6-data-at-rest)
+  * [7. Incident Management & Investigation](#7-incident-management--investigation)
+  * [8. Connections](#8-connections)
+  * [9. Dashboards, Reports & Compliance](#9-dashboards-reports--compliance)
+  * [10. Data Retention & Export](#10-data-retention--export)
 * [Endpoint Agent & Deployment](#endpoint-agent--deployment)
   * [Supported Systems](#supported-systems)
   * [Installation & Enrolment](#installation--enrolment)
@@ -51,7 +54,7 @@ It covers the three places data lives with **one detection engine, one set of po
 
 | | Where | What is checked |
 | :--- | :--- | :--- |
-| 💻 **Endpoints** | Employees' laptops and desktops | Files saved and copied, clipboard, USB drives, printing, screenshots, network uploads |
+| 💻 **Endpoints** | Employees' laptops and desktops | Files saved and copied, clipboard, USB drives, printing, screenshots and screen recordings, network uploads |
 | 📤 **Data in motion** | Data being sent | Outgoing email, Google Drive and OneDrive sharing, uploads through your web proxy, FTP and SFTP |
 | 🗄️ **Data at rest** | Data being stored | Amazon S3, Azure Blob Storage, Google Cloud Storage, PostgreSQL, MySQL, SQL Server, Oracle and Windows file shares |
 
@@ -63,14 +66,22 @@ ZeroShield DLP is built for organisations that answer to India's **Digital Perso
 * ✅ **Checksum-validated detection**: card numbers must pass the Luhn check and Aadhaar numbers the Verhoeff check, so invoice numbers and random digit runs do not raise alarms.
 * 🧬 **Your own data, never stored in clear**: upload customer lists (Exact Data Match) and confidential documents (Indexed Document Match). ZeroShield keeps only salted fingerprints.
 * 💻 **Native endpoint agent** for Windows, Linux and macOS, covering files, clipboard, USB, print, screen capture and network.
+* 🖼️ **Block screen capture**: one switch stops screenshots and screen recordings on every computer, while video calls keep working.
+* 🎯 **Rules for the right people**: limit any rule to chosen groups of people and computers, or leave them out of it.
 * ☁️ **No passwords shared for cloud**: Google Workspace and Microsoft 365 connect through admin consent, and Amazon S3 through a read-only role in your own AWS account.
 * 🧹 **Reversible clean-up**: quarantine, tombstone, revoke public access or encrypt files in Amazon S3, each with one-click undo.
 * 🔒 **Privacy by design**: matched values are masked at the moment of capture. The real card or Aadhaar number is never stored.
-* 📊 **Audit-ready reporting**: compliance reports for the DPDP Act 2023, PCI DSS v4.0, GDPR and the HIPAA Security Rule, alongside channel coverage and detector health reports.
+* �️ **Retention you choose**: keep endpoint activity for the period you choose, from 30 days to forever, and export it to CSV at any time.
+* ⚡ **Live console**: incidents, computers and scans update on their own, with a notice when new incidents arrive.
+* �📊 **Audit-ready reporting**: compliance reports for the DPDP Act 2023, PCI DSS v4.0, GDPR and the HIPAA Security Rule, alongside channel coverage and detector health reports.
 * 🧩 **Standalone**: its own console, organisation sign-up, user management, roles and sign-in activity log. Nothing else from ZeroShield is required.
 * 🏢 **Multi-tenant**: each organisation's users, agents, rules, incidents and data are kept apart by the server, not by the browser.
 
-> 📸 **[Screenshot: dlp-overview.png]** Overview: open incidents, agents online, sensitive findings, the 30-day incident trend and activity per channel.
+<p align="center">
+  <img src="assets/dlp-overview.png" alt="ZeroShield DLP Overview screen" width="900">
+  <br>
+  <em>Overview: open incidents, agents online, sensitive findings, the 30-day incident trend and activity per channel</em>
+</p>
 
 ---
 
@@ -78,9 +89,9 @@ ZeroShield DLP is built for organisations that answer to India's **Digital Perso
 
 ZeroShield DLP follows a **Connect → Detect → Enforce → Prove** lifecycle:
 
-1. **Connect**: install the agent on computers, connect email and cloud apps, register storage and write policies, all from the console.
+1. **Connect**: install the agent on computers, connect email and cloud apps, register storage, group your people and computers, and write policies, all from the console.
 2. **Detect**: every file, message, upload, clipboard copy, print job and stored object is checked by the same detection engine.
-3. **Enforce**: the policy engine picks the action, and the point of enforcement carries it out: the agent on the computer, the mail filter, your web proxy, the cloud-app connection or the storage scanner.
+3. **Enforce**: the policy engine picks the action for the people and computers each rule applies to, and the point of enforcement carries it out: the agent on the computer, the mail filter, your web proxy, the cloud-app connection or the storage scanner.
 4. **Prove**: matches are recorded as incidents with masked evidence, and reported per channel and per law for your security team and your auditors.
 
 ### Architecture diagrams
@@ -125,7 +136,7 @@ flowchart TB
     IDM["Indexed Document Match<br/>your documents"]
     ML["ML classifier<br/>document types, optional"]
     Merge["One merged verdict<br/>tier · categories · confidence"]
-    Policy{"Policy engine"}
+    Policy{"Policy engine<br/>rules · groups"}
     Allow["Allow<br/>let it through"]
     Warn["Warn<br/>tell the person, record it"]
     Enforce["Block · redact · encrypt<br/>quarantine · revoke sharing"]
@@ -173,7 +184,7 @@ flowchart TB
     Core --- Cache
     Core --> Outbox
     Outbox -->|"events, retried until delivered"| Backend
-    Backend -->|"policy and rollout"| Core
+    Backend -->|"rules for this computer and its users"| Core
     Backend -->|"signed updates"| Updater
 ```
 
@@ -193,7 +204,7 @@ sequenceDiagram
     Helper->>Agent: Clipboard text and owning app (excel.exe)
     Agent->>Agent: Card number found, Luhn check passes<br/>rule 'Block card data' matches
     Agent-->>Helper: Verdict is block
-    Helper->>Helper: Clears the clipboard
+    Helper->>Helper: Clears the clipboard<br/>and its clipboard history entry
     Agent->>Agent: Event saved to the offline queue
     Agent->>DLP: Event uploaded, retried while offline
     DLP->>DLP: Event stored and incident opened<br/>sample masked to the last 4 digits
@@ -245,15 +256,17 @@ Everything is managed from the ZeroShield DLP console. Its **Data Protection** s
 | :--- | :--- |
 | **Overview** | Open incidents, agents online, sensitive findings, scans, the 30-day trend and channel activity |
 | **Incidents** | Every detection that opened an incident, with filters, triage and history |
-| **Policies** | The enforcement mode, computer settings and the rules in force |
-| **Endpoints** | The enrolled fleet, channel health, endpoint events, installers and agent updates |
+| **Policies** | The enforcement mode, computer settings (including Block screen capture) and the rules in force |
+| **Endpoints** | The enrolled fleet, channel health, every endpoint event with CSV export, installers and agent updates |
 | **Connections** | One card per route data can take, whether it is protected, and how to set it up |
 | **Data at Rest** | Repositories, scans, findings, clean-up history and schedules |
 | **Data in Motion** | Activity per channel and every email decision |
 | **Detection & Tuning** | Your customer lists and documents, the rules in force and what has matched |
 | **Reports** | Channel coverage, detector health and compliance reports |
 
-The **Settings** screens are **User Management**, **Access Control** and **My Account**, plus **Organisations** for ZeroShield operators. They are described under [Organisations, Users & Roles](#organisations-users--roles).
+The **Settings** screens are **User Management**, **Groups**, **Access Control**, **Data Retention** and **My Account**, plus **Organisations** for ZeroShield operators. [Groups](#3-groups) and [Data Retention](#10-data-retention--export) are described below, and the rest under [Organisations, Users & Roles](#organisations-users--roles).
+
+**A live console.** The Overview, Incidents, Endpoints, Data at Rest, Data in Motion and Reports screens refresh on their own every 15 seconds while they are open, so new incidents, check-ins, scan results and email decisions appear without reloading. A new incident raises a notice on whichever page you are on, with a link straight to it, and the Incidents link shows how many are open. When ZeroShield releases a new version of the console, an open tab offers a one-click reload. Light and dark themes are built in.
 
 ### 1. Detection Engine
 
@@ -296,7 +309,7 @@ Customer lists and indexed documents are matched in email, cloud apps, network u
 
 ### 2. Policies & Enforcement
 
-A policy is the organisation's rulebook: what to look for, where, and what to do when it is found.
+A policy is the organisation's rulebook: what to look for, where, for whom, and what to do when it is found.
 
 **Enforcement mode** is one switch over every rule:
 
@@ -313,6 +326,7 @@ A policy is the organisation's rulebook: what to look for, where, and what to do
 | **Name** | For example "Block Aadhaar numbers" |
 | **Categories** | Built-in categories, your customer lists (EDM) and your documents (IDM) |
 | **Channels** | Where the rule applies: laptops, email, cloud apps, network or stored data |
+| **Applies to** | **Everyone**, **only these groups** or **everyone except these groups** (see [Groups](#3-groups)) |
 | **Minimum confidence** | How sure the engine must be before acting; checksum-valid numbers score high |
 | **Priority** | When several rules match, the most severe action wins, and priority decides between rules with the same action |
 | **Blocked destinations** | Sites or addresses laptops cannot connect to, for example wetransfer.com |
@@ -334,24 +348,40 @@ A policy is the organisation's rulebook: what to look for, where, and what to do
 | 📝 **Tombstone** | Quarantine a stored file and leave a note in its place saying where it went |
 | 🚫 **Revoke** | Remove public or shared access to a stored file so only the owner keeps it |
 
-**Computer settings** decide what laptops watch: which channels are on, up to eight folders to watch (for example Documents, Desktop and Downloads), and how often the screen is sampled (from every 30 seconds to every hour). They also decide whether USB storage is open to every drive or only to **approved drives**, identified by serial number, on Windows and Linux. A copy onto a drive that is not approved opens an incident with an **Approve this drive** button. Laptops pick up a change within about a minute.
+**Computer settings** decide what laptops watch: which channels are on, up to eight folders to watch (for example Documents, Desktop and Downloads), and how often the screen is sampled (from every 30 seconds to every hour). They also decide whether USB storage is open to every drive or only to **approved drives**, identified by serial number, on Windows and Linux. A copy onto a drive that is not approved opens an incident with an **Approve this drive** button. One more switch, **Block screen capture**, stops screenshots and screen recordings across the organisation (see [Block Screen Capture](#block-screen-capture)). Laptops pick up a change within about a minute.
 
-> 📸 **[Screenshot: dlp-policies.png]** Policies: enforcement mode, computer settings and the saved rules.
+> 📸 **[Screenshot: dlp-policies.png]** Policies: enforcement mode, computer settings (including Block screen capture) and the saved rules.
 >
-> 📸 **[Screenshot: dlp-rule-editor.png]** Rule editor: categories, channels, confidence, blocked destinations and a live custom-detector test.
+> 📸 **[Screenshot: dlp-rule-editor.png]** Rule editor: categories, channels, who the rule applies to, confidence, blocked destinations and a live custom-detector test.
 
-### 3. Endpoint DLP
+### 3. Groups
+
+Not every rule fits everyone. **Groups** collect computers and people, such as *Finance*, *Contractors* or *Branch Operations*, so a rule can be aimed at exactly the teams it is meant for.
+
+* 👥 **Computers and people together**: pick enrolled computers from a list, and add people by the name they sign in to their computer with (for example *asha* or *CORP\asha*) or by their email address. A person is matched on any computer they use.
+* 🎯 **Applies to**: every rule can apply to **Everyone**, to **Only these groups** or to **Everyone except these groups**.
+* 🌐 **Across channels**: each computer receives only the rules that apply to it and to the people who use it. In email, cloud apps and web uploads, a rule follows the person the content belongs to, such as the sender or the file's owner.
+* 🔎 **Clear at a glance**: each group shows its computers, its people and the rules that use it. A group cannot be deleted while a rule still uses it.
+* ⚡ **Quick to take effect**: computers pick up a change to a group within about a minute.
+
+**Example:** block card numbers on USB drives for *Everyone except Treasury*, and give Treasury its own rule that only warns.
+
+> 📸 **[Screenshot: dlp-groups.png]** Groups: each group's computers, people and the rules that use it.
+
+### 4. Endpoint DLP
 
 The ZeroShield agent is a lightweight program that runs on each employee's computer. It downloads the organisation's policy, checks activity against it **on the device**, enforces what the policy says and reports back. Because decisions are made locally, protection continues while a laptop is offline.
 
 | Channel | What the agent does | Example |
 | :--- | :--- | :--- |
 | 📁 **Files** | Checks files created, written, copied or renamed in watched folders, and blocks or quarantines sensitive ones | A spreadsheet of card numbers saved to Documents is blocked |
-| 📋 **Clipboard** | Checks each copy and the application that made it, then clears the clipboard, or on Windows masks just the sensitive part | An Aadhaar number copied from a customer record is cleared from the clipboard |
+| 📋 **Clipboard** | Checks each copy and the app that made it, including copied pictures, which are read with OCR on Windows. A blocked copy is cleared or, on Windows, masked, and is also removed from Windows clipboard history (Win+V) | An Aadhaar number copied from a customer record is cleared from the clipboard |
 | 💾 **Removable media** | Checks files written to USB drives and quarantines blocked files on the drive; optional approved-drives-only device control | A payroll export copied to a personal stick is quarantined on the stick |
 | 🖨️ **Print** | Reads the content of each print job and cancels the job at the spooler when blocked | Printing a customer list with PAN numbers is cancelled |
-| 🖥️ **Screen capture** | Samples the screen, reads it with on-device OCR and records any sensitive data shown | Card numbers left open on screen are recorded with a masked sample |
+| 🖥️ **Screen capture** | Samples the screen, reads it with on-device OCR and records any sensitive data shown. [Block Screen Capture](#block-screen-capture) stops screenshots and screen recordings altogether | Card numbers left open on screen are recorded with a masked sample |
 | 🌐 **Network** | Refuses connections to blocked destinations, whichever browser or tool is used | Uploads to wetransfer.com fail in every browser |
+
+The Endpoints screen also lists every event the computers report, including warnings and recorded matches that opened no incident, and exports them to CSV.
 
 > 🎬 **[Video: dlp-endpoint-demo.mp4]** Clipboard, file, USB and network blocks on a laptop, each appearing in the incident queue.
 >
@@ -359,7 +389,18 @@ The ZeroShield agent is a lightweight program that runs on each employee's compu
 
 Supported operating systems and installers are listed under [Supported Systems](#supported-systems).
 
-### 4. Data in Motion
+#### Block Screen Capture
+
+One switch in **Policies → Computer settings** stops screenshots and screen recordings on every computer in the organisation:
+
+* ⌨️ **Capture keys switched off on Windows**: PrintScreen, in every combination, and the Snipping Tool shortcuts do nothing.
+* 🛑 **Capture apps closed as they start**, on Windows, macOS and Linux: the built-in tools (Snipping Tool, Xbox Game Bar, the macOS Screenshot app, GNOME Screenshot, Spectacle) and popular apps such as OBS, Loom, ShareX, Snagit, Greenshot, Lightshot, Bandicam and CleanShot.
+* 🗑️ **Saved captures removed**: a screenshot or screen recording saved anyway is deleted as soon as it appears in the screenshots or recordings folder.
+* 📞 **Calls keep working**: Teams, Zoom and Meet calls are not affected.
+* 🔔 **Attempts on record**: attempts are recorded as incidents that say what was stopped, for example *SnippingTool.exe closed*. On Windows, the person also sees a notice that screen capture is turned off.
+* 👀 **Try it first**: in Monitor mode, capture apps are recorded and nothing is closed or removed.
+
+### 5. Data in Motion
 
 Data being sent is checked against the same policies on whichever route it takes.
 
@@ -390,7 +431,7 @@ Attachments are opened and checked, including archives. A zip or PDF attachment 
 >
 > 📸 **[Screenshot: dlp-data-in-motion.png]** Data in Motion: activity per channel and every email decision with its outcome.
 
-### 5. Data at Rest
+### 6. Data at Rest
 
 Sensitive data sitting in storage is often the largest hidden risk. ZeroShield finds it, shows exactly where it is and cleans it up, reversibly.
 
@@ -436,9 +477,9 @@ Findings in Amazon S3 are cleaned up in one click, and every clean-up can be und
 >
 > 📸 **[Screenshot: dlp-data-at-rest.png]** Data at Rest: repositories, scans, findings with masked samples, and the clean-up history with Undo.
 
-### 6. Incident Management & Investigation
+### 7. Incident Management & Investigation
 
-Each rule match the policy records becomes an incident that answers an investigator's first questions:
+Every block or warning, and every match a rule asks to record, becomes an incident that answers an investigator's first questions:
 
 * 👤 **Who**: the user or email sender, with a stable pseudonymous reference for linking incidents across channels.
 * 💻 **Where**: the computer, the Drive or OneDrive file, or the storage location.
@@ -448,11 +489,15 @@ Each rule match the policy records becomes an incident that answers an investiga
 
 **Workflow**: Open → Investigating or Escalated → Resolved, with optional notes and a timeline of who changed what.
 
+**Live**: new incidents appear as they happen. A notice with a link appears on any page of the console, and the queue refreshes every 15 seconds. Blocks are filed as High severity and warnings as Medium, and the queue filters by status, severity, channel, source and sensitivity tier.
+
+**Reasons to review**: when someone continued past a block with a reason, the incident shows the reason and the queue marks it, so an analyst can decide whether it holds.
+
 **Less noise**: repeated events are grouped. Fifty blocked connections from one computer to one site within an hour become one incident with an attempt count.
 
 > 📸 **[Screenshot: dlp-incident-detail.png]** Incident detail: the detection, masked evidence, workflow and timeline.
 
-### 7. Connections
+### 8. Connections
 
 The Connections screen answers "what is protected?" with one card per route. Each card shows its state (**Connected**, **Available** or **Off**) and the setup steps:
 
@@ -466,9 +511,9 @@ The Connections screen answers "what is protected?" with one card per route. Eac
 
 > 📸 **[Screenshot: dlp-connections.png]** Connections: one card per route, with its live state and setup steps.
 
-### 8. Dashboards, Reports & Compliance
+### 9. Dashboards, Reports & Compliance
 
-**Overview** is the security team's home page: open incidents, agents online (and how many report tampering), sensitive findings, scans, the 30-day incident trend with its blocked share, and activity per channel.
+**Overview** is the security team's home page: open incidents, agents online (and how many report tampering), sensitive findings, scans, the 30-day incident trend with its blocked share, and activity per channel. It refreshes on its own every 15 seconds.
 
 **Reports** is written for management and auditors:
 
@@ -479,6 +524,20 @@ The Connections screen answers "what is protected?" with one card per route. Eac
 **Blank is not zero.** A blank means the feature is switched off, so nothing was measured; a zero means it was measured and nothing was found. A dashboard showing a confident zero for a channel nobody enabled would mislead the people relying on it.
 
 > 📸 **[Screenshot: dlp-reports.png]** Reports: channel coverage, detector health and a DPDP Act 2023 compliance report.
+
+### 10. Data Retention & Export
+
+Decide how long the activity your computers report is kept, and take a copy whenever you need one, under **Settings → Data Retention**.
+
+* 🗓️ **Your retention period**: keep endpoint events for 30, 90 or 180 days, 1 or 2 years, or forever. The default is 90 days.
+* 🧹 **Automatic clean-up**: events older than the period are deleted automatically, within a few hours.
+* 🛡️ **Evidence always kept**: incidents, and the events that opened them, are kept whatever period you choose.
+* ✋ **Confirm before deleting**: shortening the period asks you to confirm first, and offers to export everything before anything is removed.
+* 📊 **At a glance**: how many events are stored, the date of the oldest, and the period in force.
+* 📥 **Export to CSV**: download endpoint events as a CSV file that opens in Excel or Google Sheets, filtered by date, channel and verdict. Each row says what happened, on which computer, by whom, when and which rule matched, with no file contents. The Endpoints screen exports what it is showing, including one computer's events, in the same way.
+* 🔑 **Who can do what**: administrators set the period; security analysts and auditors can see it and export events.
+
+> 📸 **[Screenshot: dlp-data-retention.png]** Data Retention: events stored, the retention period in force and the CSV export.
 
 ---
 
@@ -540,9 +599,9 @@ flowchart LR
 
 | Role | What they can do |
 | :--- | :--- |
-| **Administrator** | Everything, including policies, adding computers and managing users |
-| **Security Analyst** | Triage incidents, run scans, test content against the detectors and clean up findings. Can see the user list, but cannot change policies, add computers or manage users |
-| **Auditor** | Read every screen, including the user list; change nothing |
+| **Administrator** | Everything, including policies, groups, data retention, adding computers and managing users |
+| **Security Analyst** | Triage incidents, run scans, test content against the detectors, clean up findings and export endpoint events. Can see the user list, groups and retention, but cannot change policies, groups or retention, add computers or manage users |
+| **Auditor** | Read every screen, including the user list, and export endpoint events; change nothing |
 | **Employee** | Sign in and see their own account; no console access |
 
 > 📸 **[Screenshot: dlp-user-management.png]** User Management: people and their roles, and the Auth Activity log.
@@ -556,6 +615,8 @@ flowchart LR
 * 🧬 **Fingerprints, not copies**: customer lists are stored as salted, keyed hashes and documents as fingerprints.
 * 🗃️ **Sampling, not copying**: database scans sample columns and store no rows; storage scans keep findings, not file contents.
 * ✉️ **Minimal email data**: the email view shows a recipient count, not recipient addresses.
+* 🗓️ **Retention you control**: endpoint events are deleted automatically after the period you choose; incidents, and the events that opened them, are kept.
+* 📄 **Safe exports**: CSV exports carry no file contents, and no cell in them can run as a spreadsheet formula.
 * 🕶️ **Optional pseudonymous mode**: incidents keep only a keyed hash of the user and no name or computer name, for organisations whose rules (a works council, for example) require investigators to see a pseudonym first.
 
 ### Access control & tenant isolation
@@ -607,6 +668,7 @@ ZeroShield DLP also supports governance by:
 
 * Enforcing policy where data leaves: the laptop, the mail server, the proxy, the cloud app or the storage location.
 * Keeping an auditable trail of every decision, with masked evidence and the rule that applied.
+* Keeping endpoint activity only as long as your policy says, with automatic deletion and CSV export, which helps meet the storage-limitation and erasure duties in GDPR and the DPDP Act.
 * Showing coverage gaps openly, so auditors see what is and is not protected.
 
 ---
@@ -618,11 +680,11 @@ flowchart LR
     C["Connect<br/>routes and a pilot group"] --> M["Monitor<br/>record, stop nothing"] --> T["Tune<br/>lists, detectors, thresholds"] --> W["Warn<br/>tell people, let them continue"] --> B["Block<br/>enforce as written"] --> P["Prove<br/>reports for auditors"]
 ```
 
-1. **Connect** the routes that matter on the Connections screen and install agents on a pilot group.
+1. **Connect** the routes that matter on the Connections screen, install agents on a pilot set of computers, and put them in a *Pilot* group.
 2. **Monitor** for a week. Nothing is stopped and no incidents are opened; endpoint events, email decisions and scan findings show what would have been caught.
-3. **Tune**: add customer lists, documents, custom detectors and exceptions, and adjust confidence thresholds.
-4. **Warn** to build awareness, then **Block**. Roll agent updates out to the pilot group first, then to everyone.
-5. **Prove**: give auditors the compliance report and the channel coverage report.
+3. **Tune**: add customer lists, documents, custom detectors and exceptions, adjust confidence thresholds, and use Groups to give each team the rules it needs.
+4. **Warn** to build awareness, then **Block**. Start new rules on the *Pilot* group and widen them to everyone, and roll agent updates out to pilot devices first.
+5. **Prove**: give auditors the compliance report, the channel coverage report and, where needed, an export of endpoint events.
 
 ---
 
@@ -633,12 +695,17 @@ ZeroShield DLP is built for organisations that hold regulated personal or financ
 ### Banking & Financial Services
 Protect customer, account and card data across branches, back offices and cloud storage, in line with the DPDP Act and RBI expectations.
 
-**Example scenario:** Ananya is the CISO of a private bank. She installs the agent on branch and back-office computers in Monitor mode and uploads the customer master (account numbers and PANs) as an Exact Data Match list, so ZeroShield recognises the bank's real customers rather than anything shaped like a PAN. After a week of tuning she moves to Block: card numbers copied to the clipboard are cleared, print jobs carrying card numbers or PANs are cancelled, and exports copied to USB drives are quarantined. A scan of the bank's S3 buckets finds old customer exports, which are quarantined with one click. For the audit committee she exports the DPDP compliance report, which lists what got through as well as what was stopped.
+**Example scenario:** Ananya is the CISO of a private bank. She installs the agent on branch and back-office computers in Monitor mode and uploads the customer master (account numbers and PANs) as an Exact Data Match list, so ZeroShield recognises the bank's real customers rather than anything shaped like a PAN. After a week of tuning she moves to Block: card numbers copied to the clipboard are cleared, print jobs carrying card numbers or PANs are cancelled, and exports copied to USB drives are quarantined. The USB rule applies to everyone except the Treasury group, whose own rule only warns, so settlement files still move. A scan of the bank's S3 buckets finds old customer exports, which are quarantined with one click. For the audit committee she exports the DPDP compliance report, which lists what got through as well as what was stopped.
 
 ### Fintech & Payments
 Keep card data inside the cardholder data environment, and keep secrets out of chat, email and uploads.
 
 **Example scenario:** Rohan leads security at a payments company in PCI DSS scope. ZeroShield samples the production databases, without copying any rows, and finds card numbers in a support-ticket table that should never have held them. On developer laptops, copied AWS keys, Stripe live keys and private keys are cleared from the clipboard, and the company's web proxy refuses uploads of card data to paste sites. The PCI DSS v4.0 report shows which card-data rules block, which only record, and every incident in the period.
+
+### Contact Centres & BPO
+Protect the customer data agents see on screen all day, across large teams and shifts.
+
+**Example scenario:** Meera runs security for a contact centre that handles card and Aadhaar details for banking clients. She turns on **Block screen capture**, so agents cannot take screenshots or record customer screens, while Teams and Zoom calls carry on as normal. A rule that blocks card numbers on the clipboard and USB drives applies to everyone except the Team Leads group, whose own rule only warns, so escalations are not held up. Her clients' contracts ask for a year of activity records, so she sets Data Retention to one year and exports a CSV each quarter for the client audit.
 
 ### Healthcare
 Protect patient identifiers and clinical documents shared by email and cloud drives.
@@ -662,10 +729,13 @@ Protect drawings, price lists and supplier data that make up the company's compe
 * 📜 **DPDP readiness**: find where the personal data of people in India lives, control how it leaves, and report on it.
 * 💳 **PCI DSS scope control**: find stored card numbers outside the cardholder data environment and stop card data leaving through any channel.
 * 🚪 **Insider risk and departing employees**: watch USB drives, printing, the clipboard, uploads and email for exports of customer data.
+* 🖼️ **Screen capture control**: stop screenshots and screen recordings where screens show customer, patient or payment data.
+* 🎯 **Contractors and third parties**: give contractors, vendors and temporary staff stricter rules, using Groups.
 * ☁️ **Cloud sharing hygiene**: remove public and external links on Drive and OneDrive files that hold sensitive data.
 * 🔑 **Secret leakage**: catch API keys, tokens and private keys before they leave laptops, mail and uploads.
 * 🗄️ **Data discovery and minimisation**: inventory sensitive data across S3, Azure, Google Cloud, databases and file shares, and quarantine or encrypt exposed files in S3.
 * 🚫 **Shadow IT**: block uploads to unsanctioned cloud apps and file-sharing sites.
+* 🗓️ **Records retention**: keep endpoint activity for as long as your policy says, and export it for your own archive.
 * 🧾 **Audit preparation**: give auditors per-law compliance reports, the channel coverage report and the incident history.
 
 ---
@@ -682,7 +752,15 @@ No. Matches are masked at the moment of capture, so an analyst sees `**** **** *
 
 **Does it block, or only watch?**
 
-It blocks. Depending on the channel, ZeroShield refuses the file save or the connection, quarantines the USB copy, cancels the print job, holds, rejects, redacts or encrypts the email, removes outside sharing from the Drive or OneDrive file, and clears or masks a sensitive clipboard copy. Sensitive data shown on screen is recorded for the security team. Monitor and Warn modes let you choose when blocking starts.
+It blocks. Depending on the channel, ZeroShield refuses the file save or the connection, quarantines the USB copy, cancels the print job, holds, rejects, redacts or encrypts the email, removes outside sharing from the Drive or OneDrive file, and clears or masks a sensitive clipboard copy. Sensitive data shown on screen is recorded, and with Block screen capture on, screenshots and screen recordings are stopped. Monitor and Warn modes let you choose when blocking starts.
+
+**Can it stop screenshots and screen recordings?**
+
+Yes. Turn on **Block screen capture** in Computer settings. On Windows the PrintScreen key and Snipping Tool shortcuts stop working; on Windows, macOS and Linux, screenshot and recording apps are closed and any screenshot saved anyway is removed. Teams, Zoom and Meet calls are not affected.
+
+**Can different teams have different rules?**
+
+Yes. Put people and computers into **Groups**, then choose who each rule applies to: everyone, only those groups, or everyone except them.
 
 **What happens when a laptop is offline?**
 
@@ -700,6 +778,10 @@ Not if you start in Monitor mode, which records everything and stops nothing. Mo
 
 Yes, by the server. The browser never chooses an organisation; the sign-in gateway takes it from the signed-in session, and a request naming another organisation is refused and recorded in the audit log.
 
+**How long is our activity data kept, and can we take a copy?**
+
+Endpoint events are kept for the period you choose under **Data Retention**: 30, 90 or 180 days, 1 or 2 years, or forever, with 90 days as the default. Incidents, and the events that opened them, are always kept. You can export endpoint events to CSV at any time.
+
 **Do you need our passwords to scan cloud storage or read cloud apps?**
 
 Not for Amazon S3, which uses a read-only role in your own AWS account, or for Google Workspace and Microsoft 365, which your administrator approves and can withdraw at any time. Credentials for other storage are encrypted at rest and never shown again.
@@ -716,7 +798,7 @@ A blank means that feature is switched off, so nothing was measured. A zero mean
 
 ## Complete Product Video
 
-> 🎬 **[Video: dlp-product-walkthrough.mp4]** Full walkthrough: the console, endpoint blocks, email and Google Drive, S3 clean-up and reports.
+> 🎬 **[Video: dlp-product-walkthrough.mp4]** Full walkthrough: the console, endpoint blocks, screen capture blocking, groups, email and Google Drive, S3 clean-up and reports.
 
 ---
 
